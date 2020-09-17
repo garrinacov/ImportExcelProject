@@ -12,7 +12,7 @@ use App\Exports\MenusExport;
 use App\Imports\MenusImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
-
+use App\Service\ExcelHandler;
 
 class MenusController extends Controller
 {
@@ -29,25 +29,34 @@ class MenusController extends Controller
 
 	public function import_excel(Request $request) 
 	{
-		// validation
-		$this->validate($request, [
-			'file' => 'required|mimes:csv,xls,xlsx'
-		]);
-
 		// capture file excel
 		$file = $request->file('file');
 
-		// make name file 
-		$nama_file = rand().$file->getClientOriginalName();
+		// format excel to array
+		$excelHandler = new ExcelHandler;
+		$menus = $excelHandler->read($file);
 
-		// upload to folder file_menus in the folder public
-		$file->move('file_menus',$nama_file);
+		// loop array to set to DB:
+		foreach ($menus as $menu) {
+			Menus::create($menu);
+		}
 
-		// import data
-		Excel::import(new MenusImport, public_path('/file_menus/'.$nama_file));
+		// validation
+		// $this->validate($request, [
+		// 	'file' => 'required|mimes:csv,xls,xlsx'
+		// ]);
 
-		// notification with session
-		Session::flash('success','Data Menus Congrats Import!');
+		// // make name file 
+		// $nama_file = rand().$file->getClientOriginalName();
+
+		// // upload to folder file_menus in the folder public
+		// $file->move('file_menus',$nama_file);
+
+		// // import data
+		// Excel::import(new MenusImport, public_path('/file_menus/'.$nama_file));
+
+		// // notification with session
+		// Session::flash('success','Data Menus Congrats Import!');
 
 		// redirect page back
 		return redirect('/menus');

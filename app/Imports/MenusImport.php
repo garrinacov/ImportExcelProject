@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\ToModel;
 // use Maatwebsite\Excel\Concerns\WithValidation;
 
 
-class MenusImport implements ToModel
+class MenusImport implements ToModel    
 {
     /**
     * @param array $row
